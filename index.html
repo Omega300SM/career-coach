@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Career Coach" />
+  <meta name="theme-color" content="#0d0f0c" />
+  <title>Career Coach — Eric Mendoza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f0c;
+      --bg2: #111610;
+      --bg3: #161d12;
+      --surface: rgba(20, 28, 16, 0.85);
+      --border: #243020;
+      --border2: #1e2818;
+      --gold: #c8a96e;
+      --gold-dim: #a08050;
+      --green: #5a9e4a;
+      --green-mid: #4a6741;
+      --green-dark: #2d4a28;
+      --text: #d4c5a9;
+      --text-dim: #b8a88a;
+      --text-mute: #7a9e6a;
+      --text-faint: #3a5030;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Source Serif 4', Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── API KEY GATE ── */
+    #gate {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      z-index: 100;
+    }
+    #gate.hidden { display: none; }
+
+    .gate-logo {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: 0 0 40px rgba(74,103,65,0.35);
+      margin-bottom: 1.5rem;
+    }
+    .gate-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.4rem;
+      color: #e8dcc8;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+    .gate-sub {
+      font-size: 0.78rem;
+      color: var(--text-mute);
+      text-align: center;
+      margin-bottom: 2rem;
+      letter-spacing: 0.05em;
+    }
+    .gate-label {
+      font-size: 0.68rem;
+      color: var(--text-mute);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      align-self: flex-start;
+      width: 100%;
+      max-width: 360px;
+    }
+    .gate-input {
+      width: 100%;
+      max-width: 360px;
+      background: rgba(20,28,16,0.9);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: monospace;
+      outline: none;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s;
+    }
+    .gate-input:focus { border-color: var(--green-mid); }
+    .gate-hint {
+      font-size: 0.7rem;
+      color: var(--text-faint);
+      text-align: center;
+      max-width: 300px;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .gate-hint a { color: var(--gold-dim); text-decoration: none; }
+    .gate-btn {
+      width: 100%;
+      max-width: 360px;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+      border: none;
+      border-radius: 12px;
+      color: #e8f0e4;
+      font-size: 0.9rem;
+      font-family: 'Source Serif 4', serif;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      box-shadow: 0 0 24px rgba(74,103,65,0.3);
+      transition: opacity 0.2s;
+    }
+    .gate-btn:active { opacity: 0.8; }
+    .gate-error {
+      font-size: 0.75rem;
+      color: #c87070;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--border2);
+      padding: env(safe-area-inset-top, 0) 0 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      flex-shrink: 0;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.9rem 1.1rem;
+    }
+    .header-icon {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 0 16px rgba(74,103,65,0.35);
+      flex-shrink: 0;
+    }
+    .header-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--text-mute);
+      text-transform: uppercase;
+      margin-bottom: 0.1rem;
+    }
+    .header-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      color: #e8dcc8;
+    }
+    .header-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: breathe 2.5s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%,100% { opacity: 1; } 50% { opacity: 0.5; }
+    }
+    .status-text {
+      font-size: 0.6rem;
+      color: var(--text-mute);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── PROFILE STRIP ── */
+    .profile-strip {
+      border-bottom: 1px solid var(--border2);
+      padding: 0.6rem 1.1rem;
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      background: rgba(20,28,16,0.5);
+      flex-shrink: 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .profile-strip::-webkit-scrollbar { display: none; }
+    .profile-item { flex-shrink: 0; }
+    .profile-label {
+      font-size: 0.55rem;
+      color: #4a6840;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .profile-value {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 0.1rem;
+    }
+
+    /* ── MESSAGES ── */
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 1rem 0.5rem;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+
+    .msg-row {
+      display: flex;
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
+    .msg-row.user { flex-direction: row-reverse; }
+
+    .msg-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      margin-top: 0.15rem;
+    }
+    .msg-avatar.ai {
+      background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+      box-shadow: 0 0 10px rgba(74,103,65,0.3);
+    }
+    .msg-avatar.user { background: rgba(40,55,35,0.6); }
+
+    .msg-bubble {
+      max-width: 84%;
+      padding: 0.85rem 1rem;
+      font-size: 0.875rem;
+      line-height: 1.65;
+    }
+    .msg-bubble.ai {
+      background: rgba(20,28,16,0.85);
+      border: 1px solid var(--border);
+      border-radius: 4px 14px 14px 14px;
+      color: var(--text);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+    }
+    .msg-bubble.user {
+      background: rgba(40,55,35,0.45);
+      border: 1px solid #2a3822;
+      border-radius: 14px 4px 14px 14px;
+      color: #c8bca4;
+    }
+
+    .msg-bubble p { margin-bottom: 0.35rem; }
+    .msg-bubble p:last-child { margin-bottom: 0; }
+    .msg-bubble strong { color: var(--gold); }
+    .msg-bubble ul { margin: 0.4rem 0 0.4rem 1.1rem; }
+    .msg-bubble li { margin-bottom: 0.2rem; }
+
+    /* typing dots */
+    .typing { display: flex; gap: 5px; align-items: center; padding: 0.9rem 1rem; }
+    .typing span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green-mid);
+      animation: dot 1.2s ease-in-out infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot {
+      0%,100% { opacity:0.3; transform:scale(0.8); }
+      50% { opacity:1; transform:scale(1); }
+    }
+
+    /* ── INPUT AREA ── */
+    #input-area {
+      border-top: 1px solid var(--border2);
+      padding: 0.8rem 1rem;
+      padding-bottom: calc(0.8rem + env(safe-area-inset-bottom, 0));
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+    }
+    #user-input {
+      flex: 1;
+      background: rgba(20,28,16,0.9);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.75rem 0.9rem;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: 'Source Serif 4', serif;
+      resize: none;
+      outline: none;
+      min-height: 42px;
+      max-height: 130px;
+      overflow-y: auto;
+      line-height: 1.5;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    #user-input:focus { border-color: var(--green-mid); }
+    #user-input::placeholder { color: #3a5030; }
+
+    #send-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+      color: #e8f0e4;
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 0 14px rgba(74,103,65,0.35);
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #send-btn:disabled {
+      background: rgba(40,55,35,0.4);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    #send-btn:not(:disabled):active { transform: scale(0.93); }
+
+    .input-hint {
+      font-size: 0.6rem;
+      color: var(--text-faint);
+      text-align: center;
+      margin-top: 0.4rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── CLEAR BTN ── */
+    #clear-btn {
+      background: none;
+      border: none;
+      color: #3a5030;
+      font-size: 0.65rem;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      padding: 0 0.25rem;
+      text-transform: uppercase;
+      align-self: center;
+    }
+
+    #bottom-anchor { height: 1px; }
+  </style>
+</head>
+<body>
+
+  <!-- API KEY GATE -->
+  <div id="gate">
+    <div class="gate-logo">⚡</div>
+    <div class="gate-title">Career Strategy Agent</div>
+    <div class="gate-sub">Eric Mendoza · Senior Leader</div>
+    <div class="gate-label">Anthropic API Key</div>
+    <input class="gate-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" autocorrect="off" spellcheck="false" />
+    <div class="gate-hint">
+      Your key is stored only on this device.<br>
+      Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+    </div>
+    <button class="gate-btn" onclick="saveKey()">Enter My Coach →</button>
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+
+  <!-- MAIN APP -->
+  <header>
+    <div class="header-inner">
+      <div class="header-icon">⚡</div>
+      <div>
+        <div class="header-label">Career Strategy Agent</div>
+        <div class="header-name">Eric Mendoza</div>
+      </div>
+      <div class="header-status">
+        <div class="status-dot"></div>
+        <div class="status-text">Live</div>
+        <button id="clear-btn" onclick="clearKey()" title="Reset API key">⚙</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="profile-strip">
+    <div class="profile-item">
+      <div class="profile-label">Role</div>
+      <div class="profile-value">S&OP & Digital Lead</div>
+    </div>
+    <div class="profile-item">
+      <div class="profile-label">Identity</div>
+      <div class="profile-value">Strategic Transformation Integrator</div>
+    </div>
+    <div class="profile-item">
+      <div class="profile-label">Target</div>
+      <div class="profile-value">Sr. Director → VP</div>
+    </div>
+    <div class="profile-item">
+      <div class="profile-label">Status</div>
+      <div class="profile-value">Career Inflection Point</div>
+    </div>
+  </div>
+
+  <div id="messages"></div>
+
+  <div id="input-area">
+    <div class="input-row">
+      <textarea id="user-input" placeholder="Ask your career coach…" rows="1"></textarea>
+      <button id="send-btn" disabled>↑</button>
+    </div>
+    <div class="input-hint">TAP SEND OR RETURN TO SEND</div>
+  </div>
+
+  <script>
+    // ── SYSTEM PROMPT ──
+    const SYSTEM = `You are Eric Mendoza's personal Career Strategy Agent — a dedicated executive career coach, strategic advisor, and leadership development partner.
+
+CRITICAL: You have already done extensive work with Eric. You know him deeply. Do NOT ask him to re-introduce himself. Jump straight into coaching from where you left off. Reference his history naturally, like a trusted advisor who knows him well.
+
+== ERIC'S FULL PROFILE ==
+NAME: Eric Mendoza | CAREER STAGE: Senior Leader, 22 years experience
+CURRENT ROLE: S&OP and Digital Lead for E2E Planning
+LEADERSHIP IDENTITY: Strategic Transformation Integrator
+
+EXPERIENCE: 22 years, 4 companies — Sales → Planning → Strategy → Finance (briefly) → Transformation Leadership
+
+CORE STRENGTHS: Broad business acumen, organizational agility, digital acumen, planning expertise, negotiation skills, project management, people leadership, navigating ambiguity, cross-functional leadership
+
+UNIQUE VALUE: Connects Strategy + Technology + People + Execution simultaneously — rare executive combination
+
+ENERGIZERS: Complex problems, non-linear challenges, building new capabilities, improving systems, cross-functional work, learning, visible impact
+DRAINERS: Repetition, stagnation, lack of tangible wins, maintenance-focused roles
+
+CAREER VISION:
+Path 1: Sr Director – Project Management/Innovation (lead innovation portfolio, cross-functional execution, new capabilities to market)
+Path 2: Sr Director – S&OP Leadership (enterprise planning cycle, strategy to execution, business alignment)
+Long-Term North Star: VP/Sr Director — Strategy to Execution/Enterprise Transformation
+"Be the executive who connects strategy, people, and execution across the organization."
+
+CAREER MAP:
+- Core (Now): S&OP & Digital Transformation Leader
+- Adjacent (Next): Director/Sr Director PMO, Director/Sr Director S&OP, Director Digital Transformation
+- Aspirational: Sr Director Strategy to Execution, VP Enterprise Transformation, VP Planning/Operations Strategy
+
+CONSTRAINTS: Nashville Metro (firm), Travel ~10% max, Compensation ~$250K baseline, Family = non-negotiable priority, Long-term stability valued
+
+CURRENT SITUATION — CAREER INFLECTION POINT:
+- Transformation role ends September 2026
+- Possible succession to boss role (uncertain)
+- Leadership movement uncertainty above him
+- Concern about severance risk
+- 12 years with current company
+This is a critical inflection point requiring proactive navigation.
+
+2026 DEVELOPMENT PLAN:
+Activity 1: Wharton Executive Presence (Online) + Dale Carnegie (~$4,900, within $5K budget)
+Activity 2: Industry Conference — Gartner Supply Chain Symposium / Kinaxis Kinexions / Supply Chain AI Conference (~$2,000–$3,000)
+
+12-MONTH DEVELOPMENT FOCUS: Executive Presence, Enterprise Leadership, Interview Readiness, Digital Leadership, Sustainability & Motivation
+
+CAREER CONVERSATION STRATEGY:
+- With Boss: Align on next role, show readiness, demonstrate leadership maturity (Tone: calm, strategic, confident)
+- With Boss's Boss: Increase visibility, position for future leadership, show enterprise thinking (Tone: executive-level, forward-looking, composed)
+
+MID-CAREER MOTIVATION:
+Diagnosed: Achievement Fatigue / Plateau of Mastery
+Symptoms: Exhaustion, desire to fade into background, concern about losing motivation
+Strategy: Shift Career Climb → Career Craft (legacy thinking), reignite challenge via mentoring/innovation, protect energy with recovery cycles and family focus
+
+CAREER NARRATIVE: "I started in commercial roles, expanded into planning and strategy, and evolved into transformation leadership where I connect business strategy, digital capabilities, and execution to drive enterprise outcomes."
+
+LEADERSHIP EVOLUTION: Functional Leader → Enterprise Integrator (in progress)
+
+RISKS: Transformation role ending without clear landing, leadership changes above, career plateau fatigue, reduced visibility post-transformation
+MITIGATION: Proactive conversations, executive development, industry exposure, external networking
+
+CURRENT STATUS: Highly valued internally, positioned for advancement, at career inflection point, expanding into executive leadership, building long-term leadership identity.
+
+YOUR COACHING STYLE: Direct, strategic, personalized. Reference Eric's specific situation. Never be generic. Ask follow-up questions. Connect all advice back to his North Star, constraints, and current inflection point.`;
+
+    const INITIAL_MSG = {
+      role: "assistant",
+      content: `Welcome back, Eric. Your Career Strategy Agent is live — fully loaded with everything we've built together.\n\nI have your complete profile in context: the Strategic Transformation Integrator identity, your career map, the September inflection point, the Wharton + Dale Carnegie path, and where things stand with your boss and the succession question.\n\nA lot is in motion right now. Where do you want to focus today?\n\n**A few options:**\n- The September transition and landing plan\n- Preparing your career conversations (boss / boss's boss)\n- Moving forward on executive presence development\n- Checking in on motivation and energy\n\nWhat's most pressing?`
+    };
+
+    // ── STATE ──
+    let messages = [INITIAL_MSG];
+    let apiKey = localStorage.getItem('csa_key') || '';
+    let isLoading = false;
+
+    // ── INIT ──
+    const gate = document.getElementById('gate');
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    function init() {
+      if (apiKey && apiKey.startsWith('sk-ant-')) {
+        gate.classList.add('hidden');
+        renderMessages();
+      }
+      inputEl.addEventListener('input', onInputChange);
+      inputEl.addEventListener('keydown', onKeyDown);
+      sendBtn.addEventListener('click', send);
+      inputEl.addEventListener('input', autoResize);
+    }
+
+    function saveKey() {
+      const val = document.getElementById('api-key-input').value.trim();
+      if (!val.startsWith('sk-ant-')) {
+        document.getElementById('gate-error').textContent = 'Key must start with sk-ant-';
+        return;
+      }
+      apiKey = val;
+      localStorage.setItem('csa_key', apiKey);
+      gate.classList.add('hidden');
+      renderMessages();
+    }
+
+    function clearKey() {
+      if (confirm('Reset API key?')) {
+        localStorage.removeItem('csa_key');
+        apiKey = '';
+        gate.classList.remove('hidden');
+      }
+    }
+
+    // ── RENDER ──
+    function renderMessages() {
+      messagesEl.innerHTML = '';
+      messages.forEach(m => appendBubble(m.role, m.content));
+      scrollBottom();
+    }
+
+    function appendBubble(role, content) {
+      const row = document.createElement('div');
+      row.className = `msg-row ${role}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = `msg-avatar ${role === 'assistant' ? 'ai' : 'user'}`;
+      avatar.textContent = role === 'assistant' ? '⚡' : '👤';
+
+      const bubble = document.createElement('div');
+      bubble.className = `msg-bubble ${role === 'assistant' ? 'ai' : 'user'}`;
+      bubble.innerHTML = formatContent(content);
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      messagesEl.appendChild(row);
+    }
+
+    function formatContent(text) {
+      // Bold
+      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Bullet lists
+      const lines = text.split('\n');
+      let html = '';
+      let inList = false;
+      for (const line of lines) {
+        if (line.startsWith('- ') || line.startsWith('• ')) {
+          if (!inList) { html += '<ul>'; inList = true; }
+          html += `<li>${line.replace(/^[-•]\s/, '')}</li>`;
+        } else {
+          if (inList) { html += '</ul>'; inList = false; }
+          if (line.trim() === '') html += '<br>';
+          else html += `<p>${line}</p>`;
+        }
+      }
+      if (inList) html += '</ul>';
+      return html;
+    }
+
+    function showTyping() {
+      const row = document.createElement('div');
+      row.className = 'msg-row assistant';
+      row.id = 'typing-row';
+      row.innerHTML = `
+        <div class="msg-avatar ai">⚡</div>
+        <div class="msg-bubble ai typing"><span></span><span></span><span></span></div>`;
+      messagesEl.appendChild(row);
+      scrollBottom();
+    }
+
+    function removeTyping() {
+      const el = document.getElementById('typing-row');
+      if (el) el.remove();
+    }
+
+    function scrollBottom() {
+      setTimeout(() => {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, 50);
+    }
+
+    // ── INPUT ──
+    function onInputChange() {
+      sendBtn.disabled = !inputEl.value.trim() || isLoading;
+    }
+
+    function onKeyDown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!sendBtn.disabled) send();
+      }
+    }
+
+    function autoResize() {
+      inputEl.style.height = 'auto';
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 130) + 'px';
+    }
+
+    // ── API CALL ──
+    async function send() {
+      const text = inputEl.value.trim();
+      if (!text || isLoading) return;
+
+      isLoading = true;
+      sendBtn.disabled = true;
+      inputEl.value = '';
+      inputEl.style.height = 'auto';
+
+      messages.push({ role: 'user', content: text });
+      appendBubble('user', text);
+      showTyping();
+      scrollBottom();
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: SYSTEM,
+            messages: messages.map(m => ({ role: m.role, content: m.content }))
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          throw new Error(data.error.message || 'API error');
+        }
+
+        const reply = data.content?.find(b => b.type === 'text')?.text || 'Something went wrong. Try again.';
+        removeTyping();
+        messages.push({ role: 'assistant', content: reply });
+        appendBubble('assistant', reply);
+
+      } catch (err) {
+        removeTyping();
+        const errMsg = err.message.includes('401') || err.message.includes('auth')
+          ? 'Invalid API key. Tap ⚙ to reset it.'
+          : 'Connection error. Check your internet and try again.';
+        messages.push({ role: 'assistant', content: errMsg });
+        appendBubble('assistant', errMsg);
+      } finally {
+        isLoading = false;
+        sendBtn.disabled = !inputEl.value.trim();
+        scrollBottom();
+      }
+    }
+
+    // Allow Enter on gate input
+    document.getElementById('api-key-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') saveKey();
+    });
+
+    init();
+  </script>
+</body>
+</html>
